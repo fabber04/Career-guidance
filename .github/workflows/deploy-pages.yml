@@ -30,10 +30,12 @@ jobs:
       
       - name: Prepare files for deployment
         run: |
-          # Copy prototype files to root for GitHub Pages
-          cp -r prototype/* .
-          # Ensure index.html is in root
-          cp prototype/index.html index.html
+          # Copy prototype files to root, excluding README.md
+          cp prototype/index.html .
+          cp -r prototype/styles .
+          cp -r prototype/scripts .
+          # Remove any README.md files that might interfere
+          rm -f README.md prototype/README.md
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
