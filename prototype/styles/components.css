@@ -658,9 +658,6 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
     white-space: nowrap;
 }
 
@@ -668,10 +665,6 @@
     background-color: #2563eb;
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
-}
-
-.chat-btn i {
-    font-size: 14px;
 }
 
 .view-all-students {
