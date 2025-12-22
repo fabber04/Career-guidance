@@ -454,6 +454,30 @@
     color: var(--gray-700);
 }
 
+.career-fields-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.career-field-tag {
+    background-color: var(--quora-text);
+    color: var(--white);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    transition: all 0.2s;
+}
+
+.career-field-tag:hover {
+    background-color: var(--quora-red);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
 /* ============================================================================
    CHAT WITH STUDENTS SECTION
    ============================================================================ */
