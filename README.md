@@ -13,7 +13,7 @@ A comprehensive career guidance platform for the National University of Science 
 
 ## Prototype
 
-The prototype is available at: [GitHub Pages](https://fabber04.github.io/literate-octo-waffle/)
+The prototype is available at: [GitHub Pages](https://fabber04.github.io/career-advice-/)
 
 ### Local Development
 
