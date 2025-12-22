@@ -125,41 +125,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Read more fields functionality
-    const readMoreBtn = document.getElementById('read-more-fields');
-    const hiddenFields = document.querySelectorAll('.career-field-tag.hidden-field');
-    
-    // Ensure hidden fields are hidden on page load
-    if (hiddenFields.length > 0) {
+    // Read more fields functionality - run immediately on page load
+    (function() {
+        const readMoreBtn = document.getElementById('read-more-fields');
+        const hiddenFields = document.querySelectorAll('.career-field-tag.hidden-field');
+        
+        // Force hide all hidden fields on page load
         hiddenFields.forEach(field => {
-            if (!field.classList.contains('show')) {
-                field.style.display = 'none';
-            }
+            field.style.display = 'none';
+            field.style.visibility = 'hidden';
         });
-    }
-    
-    if (readMoreBtn) {
-        readMoreBtn.addEventListener('click', function() {
-            const isExpanded = this.classList.contains('expanded');
-            
-            if (isExpanded) {
-                // Collapse - hide fields
-                hiddenFields.forEach(field => {
-                    field.classList.remove('show');
-                    field.style.display = 'none';
-                });
-                this.innerHTML = '<i class="fas fa-chevron-down"></i> Read More';
-                this.classList.remove('expanded');
-            } else {
-                // Expand - show fields
-                hiddenFields.forEach(field => {
-                    field.classList.add('show');
-                    field.style.display = 'inline-block';
-                });
-                this.innerHTML = '<i class="fas fa-chevron-down"></i> Show Less';
-                this.classList.add('expanded');
-            }
-        });
-    }
+        
+        if (readMoreBtn && hiddenFields.length > 0) {
+            readMoreBtn.addEventListener('click', function() {
+                const isExpanded = this.classList.contains('expanded');
+                
+                if (isExpanded) {
+                    // Collapse - hide fields
+                    hiddenFields.forEach(field => {
+                        field.classList.remove('show');
+                        field.style.display = 'none';
+                        field.style.visibility = 'hidden';
+                    });
+                    this.innerHTML = '<i class="fas fa-chevron-down"></i> Read More';
+                    this.classList.remove('expanded');
+                } else {
+                    // Expand - show fields
+                    hiddenFields.forEach(field => {
+                        field.classList.add('show');
+                        field.style.display = 'inline-block';
+                        field.style.visibility = 'visible';
+                    });
+                    this.innerHTML = '<i class="fas fa-chevron-down"></i> Show Less';
+                    this.classList.add('expanded');
+                }
+            });
+        }
+    })();
 });
 

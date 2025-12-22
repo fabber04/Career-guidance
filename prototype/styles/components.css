@@ -479,12 +479,15 @@
     box-shadow: var(--shadow-md);
 }
 
-.career-field-tag.hidden-field {
+/* Hide fields with hidden-field class - must come after base rule */
+.career-fields-list .career-field-tag.hidden-field {
     display: none !important;
+    visibility: hidden !important;
 }
 
-.career-field-tag.hidden-field.show {
+.career-fields-list .career-field-tag.hidden-field.show {
     display: inline-block !important;
+    visibility: visible !important;
     animation: fadeIn 0.3s ease-in;
 }
 
