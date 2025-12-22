@@ -480,11 +480,11 @@
 }
 
 .career-field-tag.hidden-field {
-    display: none;
+    display: none !important;
 }
 
 .career-field-tag.hidden-field.show {
-    display: inline-block;
+    display: inline-block !important;
     animation: fadeIn 0.3s ease-in;
 }
 

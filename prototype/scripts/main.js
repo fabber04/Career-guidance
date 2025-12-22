@@ -127,15 +127,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Read more fields functionality
     const readMoreBtn = document.getElementById('read-more-fields');
+    const hiddenFields = document.querySelectorAll('.career-field-tag.hidden-field');
+    
+    // Ensure hidden fields are hidden on page load
+    if (hiddenFields.length > 0) {
+        hiddenFields.forEach(field => {
+            if (!field.classList.contains('show')) {
+                field.style.display = 'none';
+            }
+        });
+    }
+    
     if (readMoreBtn) {
         readMoreBtn.addEventListener('click', function() {
-            const hiddenFields = document.querySelectorAll('.career-field-tag.hidden-field');
             const isExpanded = this.classList.contains('expanded');
             
             if (isExpanded) {
                 // Collapse - hide fields
                 hiddenFields.forEach(field => {
                     field.classList.remove('show');
+                    field.style.display = 'none';
                 });
                 this.innerHTML = '<i class="fas fa-chevron-down"></i> Read More';
                 this.classList.remove('expanded');
@@ -143,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Expand - show fields
                 hiddenFields.forEach(field => {
                     field.classList.add('show');
+                    field.style.display = 'inline-block';
                 });
                 this.innerHTML = '<i class="fas fa-chevron-down"></i> Show Less';
                 this.classList.add('expanded');
