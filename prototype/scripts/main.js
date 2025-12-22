@@ -124,5 +124,30 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('This would show all 23 students registered for Computer Science program.\n\nIn the full version, this would navigate to a page listing all students with filters and search functionality.');
         });
     }
+
+    // Read more fields functionality
+    const readMoreBtn = document.getElementById('read-more-fields');
+    if (readMoreBtn) {
+        readMoreBtn.addEventListener('click', function() {
+            const hiddenFields = document.querySelectorAll('.career-field-tag.hidden-field');
+            const isExpanded = this.classList.contains('expanded');
+            
+            if (isExpanded) {
+                // Collapse - hide fields
+                hiddenFields.forEach(field => {
+                    field.classList.remove('show');
+                });
+                this.innerHTML = '<i class="fas fa-chevron-down"></i> Read More';
+                this.classList.remove('expanded');
+            } else {
+                // Expand - show fields
+                hiddenFields.forEach(field => {
+                    field.classList.add('show');
+                });
+                this.innerHTML = '<i class="fas fa-chevron-down"></i> Show Less';
+                this.classList.add('expanded');
+            }
+        });
+    }
 });
 

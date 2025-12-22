@@ -457,15 +457,16 @@
 .career-fields-list {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-sm);
     margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
 }
 
 .career-field-tag {
     background-color: var(--quora-text);
     color: var(--white);
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 500;
     display: inline-block;
@@ -474,8 +475,62 @@
 
 .career-field-tag:hover {
     background-color: var(--quora-red);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.career-field-tag.hidden-field {
+    display: none;
+}
+
+.career-field-tag.hidden-field.show {
+    display: inline-block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.read-more-btn {
+    background-color: transparent;
+    border: 1px solid var(--quora-text);
+    color: var(--quora-text);
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    width: 100%;
+    justify-content: center;
+}
+
+.read-more-btn:hover {
+    background-color: var(--quora-text);
+    color: var(--white);
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
+}
+
+.read-more-btn i {
+    font-size: 11px;
+    transition: transform 0.3s;
+}
+
+.read-more-btn.expanded i {
+    transform: rotate(180deg);
 }
 
 /* ============================================================================
