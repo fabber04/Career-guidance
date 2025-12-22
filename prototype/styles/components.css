@@ -828,12 +828,14 @@
 @media (max-width: 1200px) {
     .main-container {
         grid-template-columns: 180px 1fr 240px;
+        gap: var(--spacing-lg);
     }
 }
 
 @media (max-width: 968px) {
     .main-container {
         grid-template-columns: 1fr;
+        padding: var(--spacing-md);
     }
     
     .sidebar, .right-sidebar {
@@ -847,26 +849,223 @@
     .outcomes-grid {
         grid-template-columns: 1fr;
     }
+    
+    .review-card {
+        padding: var(--spacing-md);
+    }
+    
+    .question-card {
+        padding: var(--spacing-md);
+    }
+    
+    .student-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+    }
+    
+    .chat-btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 640px) {
     .nav-container {
         flex-wrap: wrap;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .nav-logo {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .nav-logo h1 {
+        font-size: 16px;
     }
     
     .nav-search {
         order: 3;
         width: 100%;
         max-width: 100%;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .nav-links {
+        order: 2;
+        gap: var(--spacing-xs);
+    }
+    
+    .nav-link {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    
+    .btn-primary {
+        padding: 8px 14px;
+        font-size: 12px;
     }
     
     .program-header {
         flex-direction: column;
         gap: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
     }
     
     .program-rating {
         text-align: left;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .program-title-section h2 {
+        font-size: 20px;
+        line-height: 1.3;
+    }
+    
+    .program-card {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .section-header h3 {
+        font-size: 18px;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+    
+    .filter-btn {
+        flex: 1;
+        min-width: 80px;
+        margin-left: 0;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .review-rating {
+        align-items: flex-start;
+    }
+    
+    .review-pros-cons {
+        gap: var(--spacing-md);
+    }
+    
+    .review-actions {
+        flex-wrap: wrap;
+    }
+    
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
+    .question-tags {
+        flex-wrap: wrap;
+    }
+    
+    .tag {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+    
+    .answer-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+    
+    .answer-actions {
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+    
+    .upvote-btn, .downvote-btn, .comment-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .best-answer-btn {
+        width: 100%;
+        margin-left: 0;
+        margin-top: var(--spacing-xs);
+    }
+    
+    .student-card {
+        padding: var(--spacing-md);
+    }
+    
+    .student-avatar {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .student-name {
+        font-size: 15px;
+    }
+    
+    .student-details {
+        font-size: 13px;
+    }
+    
+    .chat-btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .outcome-card {
+        padding: var(--spacing-md);
+    }
+    
+    .outcome-value {
+        font-size: 20px;
+    }
+    
+    .career-fields-list {
+        gap: var(--spacing-xs);
+    }
+    
+    .career-field-tag {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .read-more-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .btn-secondary {
+        width: 100%;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .official-section {
+        padding: var(--spacing-md);
+    }
+    
+    .official-content p {
+        font-size: 14px;
+        margin-bottom: var(--spacing-xs);
     }
 }
 
