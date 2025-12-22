@@ -1,0 +1,526 @@
+================================================================================
+COMPLETE DATA MODEL SPECIFICATION
+Career Guidance Platform - NUST
+================================================================================
+
+This document defines every table, field, relationship, and business rule
+for the database. Read this before writing any database code.
+
+================================================================================
+CORE PRINCIPLE
+================================================================================
+
+OFFICIAL DATA vs CONTRIBUTOR DATA must be clearly separated:
+- Official data: Immutable, owned by departments, fact-based
+- Contributor data: Mutable, owned by verified users, opinion-based
+
+================================================================================
+TABLE 1: USERS (Base Authentication)
+================================================================================
+
+Purpose: All users start here. This is the authentication table.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+email               VARCHAR(255) UNIQUE NOT NULL
+password_hash       VARCHAR(255) NOT NULL
+role                ENUM('student', 'contributor', 'department', 'admin') DEFAULT 'student'
+full_name           VARCHAR(255)
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+is_active           BOOLEAN DEFAULT TRUE
+last_login          TIMESTAMP NULL
+
+Business Rules:
+- Email must be unique
+- Password must be hashed (never store plain text)
+- Role determines what the user can do
+- One user can have multiple roles (handled via junction tables)
+
+Relationships:
+- One User can have one Student profile (1:1)
+- One User can have one Contributor profile (1:1)
+- One User can belong to one Department (1:1, if role is 'department')
+
+================================================================================
+TABLE 2: DEPARTMENTS
+================================================================================
+
+Purpose: Represents NUST departments that own official program data.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+name                VARCHAR(255) NOT NULL
+code                VARCHAR(50) UNIQUE (e.g., "CS", "EE", "ME")
+description         TEXT
+contact_email       VARCHAR(255)
+contact_phone       VARCHAR(50)
+head_of_department  VARCHAR(255)
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Business Rules:
+- Department code must be unique
+- Department can have multiple programs
+- Department users can only edit their own department's programs
+
+Relationships:
+- One Department has many Programs (1:many)
+- One Department has one or more Department Users (1:many via Users table)
+
+Example Data:
+- id: 1, name: "Computer Science", code: "CS"
+- id: 2, name: "Electrical Engineering", code: "EE"
+
+================================================================================
+TABLE 3: PROGRAMS
+================================================================================
+
+Purpose: Academic programs offered at NUST. This is the CORE entity.
+
+Fields:
+--------
+id                      INTEGER PRIMARY KEY AUTO_INCREMENT
+name                    VARCHAR(255) NOT NULL
+code                    VARCHAR(50) UNIQUE (e.g., "CS101", "EE201")
+department_id           INTEGER NOT NULL FOREIGN KEY -> Departments(id)
+description             TEXT
+entry_requirements      TEXT (official, immutable)
+career_outcomes         JSON (array of career paths)
+skills_required         JSON (array of skills)
+typical_internships     JSON (array of internship types)
+duration_years          INTEGER DEFAULT 4
+degree_type             VARCHAR(50) (e.g., "Bachelor", "Master")
+official_owner_id       INTEGER FOREIGN KEY -> Users(id) (department user who owns this)
+last_updated            TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+is_active               BOOLEAN DEFAULT TRUE
+
+Business Rules:
+- Program code must be unique
+- Only department users can edit official data
+- Official data changes must be logged (audit trail)
+- entry_requirements, career_outcomes, skills_required are OFFICIAL (immutable by contributors)
+
+Relationships:
+- Many Programs belong to one Department (many:1)
+- One Program has many GuidanceThreads (1:many)
+- One Program has one SimulationTemplate (1:1)
+- Many Students can save many Programs (many:many via SavedPrograms)
+
+Example Data:
+- id: 1, name: "Bachelor of Computer Science", code: "CS101", department_id: 1
+- entry_requirements: "A-Level with Mathematics and Physics, minimum B grade"
+- skills_required: ["Programming", "Problem Solving", "Mathematics"]
+- career_outcomes: ["Software Engineer", "Data Scientist", "Systems Analyst"]
+
+================================================================================
+TABLE 4: STUDENTS
+================================================================================
+
+Purpose: Student-specific profile data.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+user_id             INTEGER UNIQUE NOT NULL FOREIGN KEY -> Users(id)
+student_id          VARCHAR(50) UNIQUE (NUST student ID, optional)
+year_of_study       INTEGER (1, 2, 3, 4)
+interests           JSON (array of interest tags)
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Business Rules:
+- One user can only have one student profile
+- Interests are stored as JSON array: ["programming", "robotics", "AI"]
+- Student ID is optional (for privacy, can register without it)
+
+Relationships:
+- One Student belongs to one User (1:1)
+- One Student has many SavedPrograms (1:many)
+- One Student has many GuidanceThreads (1:many, as question asker)
+- One Student has many StudentInterests (1:many)
+
+================================================================================
+TABLE 5: STUDENT_INTERESTS
+================================================================================
+
+Purpose: Track what topics/fields students are interested in.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+student_id          INTEGER NOT NULL FOREIGN KEY -> Students(id)
+interest_tag        VARCHAR(100) NOT NULL
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Business Rules:
+- Same interest tag can be added only once per student
+- Used for recommendations
+
+Relationships:
+- Many StudentInterests belong to one Student (many:1)
+
+Example Data:
+- student_id: 1, interest_tag: "artificial intelligence"
+- student_id: 1, interest_tag: "web development"
+
+================================================================================
+TABLE 6: SAVED_PROGRAMS
+================================================================================
+
+Purpose: Programs that students have bookmarked.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+student_id          INTEGER NOT NULL FOREIGN KEY -> Students(id)
+program_id          INTEGER NOT NULL FOREIGN KEY -> Programs(id)
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Business Rules:
+- One student can save the same program only once (unique constraint on student_id + program_id)
+- Used to show "My Saved Programs" on student dashboard
+
+Relationships:
+- Many SavedPrograms belong to one Student (many:1)
+- Many SavedPrograms reference one Program (many:1)
+
+================================================================================
+TABLE 7: CONTRIBUTORS
+================================================================================
+
+Purpose: Verified contributors who can answer questions.
+
+Fields:
+--------
+id                      INTEGER PRIMARY KEY AUTO_INCREMENT
+user_id                 INTEGER UNIQUE NOT NULL FOREIGN KEY -> Users(id)
+verification_state      ENUM('unverified', 'pending', 'verified', 'rejected') DEFAULT 'unverified'
+verification_method     VARCHAR(50) (e.g., "university_email", "document_upload")
+reputation_score        INTEGER DEFAULT 0
+credentials_file_path  VARCHAR(500) (path to uploaded document)
+verification_notes      TEXT (admin notes during review)
+verified_at             TIMESTAMP NULL
+created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Business Rules:
+- Only verified contributors can answer questions
+- Reputation starts at 0, increases with upvotes
+- Verification requires manual admin review
+- Verification expires after 1 year (need re-verification)
+
+Relationships:
+- One Contributor belongs to one User (1:1)
+- One Contributor has many Posts (1:many, as answerer)
+- One Contributor has many VerificationAuditLog entries (1:many)
+
+Reputation Calculation:
+- Initial verification: +10 points
+- Each upvote on answer: +1 point
+- Best answer selected: +5 points
+- Answer flagged and removed: -10 points
+
+================================================================================
+TABLE 8: VERIFICATION_AUDIT_LOG
+================================================================================
+
+Purpose: Track all verification state changes for accountability.
+
+Fields:
+--------
+id                      INTEGER PRIMARY KEY AUTO_INCREMENT
+contributor_id          INTEGER NOT NULL FOREIGN KEY -> Contributors(id)
+old_state               VARCHAR(50)
+new_state               VARCHAR(50)
+reviewer_id             INTEGER FOREIGN KEY -> Users(id) (admin who made change)
+reviewer_notes          TEXT
+created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Business Rules:
+- Every state change must be logged
+- Cannot delete audit logs (immutable history)
+- Used to track verification history
+
+Relationships:
+- Many VerificationAuditLog entries belong to one Contributor (many:1)
+
+Example Flow:
+1. contributor_id: 1, old_state: "unverified", new_state: "pending", reviewer_id: NULL
+2. contributor_id: 1, old_state: "pending", new_state: "verified", reviewer_id: 5, reviewer_notes: "Valid NUST alumni email"
+
+================================================================================
+TABLE 9: GUIDANCE_THREADS
+================================================================================
+
+Purpose: Q&A threads where students ask questions and contributors answer.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+title               VARCHAR(255) NOT NULL
+program_id          INTEGER NULL FOREIGN KEY -> Programs(id) (optional, can be general question)
+student_id          INTEGER NOT NULL FOREIGN KEY -> Students(id) (who asked)
+status              ENUM('open', 'closed', 'archived') DEFAULT 'open'
+view_count          INTEGER DEFAULT 0
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Business Rules:
+- Thread can be program-specific OR general
+- Only students can create threads
+- Only verified contributors can post answers
+- Status "closed" means question is resolved
+
+Relationships:
+- One GuidanceThread belongs to one Student (many:1, as question asker)
+- One GuidanceThread optionally belongs to one Program (many:1, optional)
+- One GuidanceThread has many Posts (1:many)
+
+Example:
+- title: "What programming languages should I learn for CS101?"
+- program_id: 1 (CS101)
+- student_id: 5
+
+================================================================================
+TABLE 10: POSTS
+================================================================================
+
+Purpose: Individual posts within a thread (questions, answers, comments).
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+thread_id           INTEGER NOT NULL FOREIGN KEY -> GuidanceThreads(id)
+author_id           INTEGER NOT NULL FOREIGN KEY -> Users(id)
+content             TEXT NOT NULL
+post_type           ENUM('question', 'answer', 'comment') DEFAULT 'answer'
+is_best_answer      BOOLEAN DEFAULT FALSE
+upvote_count        INTEGER DEFAULT 0
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+is_flagged          BOOLEAN DEFAULT FALSE
+flag_reason         TEXT NULL
+
+Business Rules:
+- First post in thread is always type 'question'
+- Only verified contributors can post type 'answer'
+- Students can post 'question' and 'comment'
+- Upvote count is calculated from Upvotes table (denormalized for performance)
+- is_best_answer can only be set by thread owner (student)
+
+Relationships:
+- Many Posts belong to one GuidanceThread (many:1)
+- One Post belongs to one User (many:1, as author)
+- One Post has many Upvotes (1:many)
+- One Post has many Flags (1:many)
+
+================================================================================
+TABLE 11: UPVOTES
+================================================================================
+
+Purpose: Track which users upvoted which posts.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+post_id             INTEGER NOT NULL FOREIGN KEY -> Posts(id)
+user_id             INTEGER NOT NULL FOREIGN KEY -> Users(id)
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Business Rules:
+- One user can upvote a post only once (unique constraint on post_id + user_id)
+- Upvoting a post increases contributor reputation
+- Upvoting your own post is not allowed
+
+Relationships:
+- Many Upvotes belong to one Post (many:1)
+- Many Upvotes belong to one User (many:1)
+
+When upvote is created:
+1. Insert into Upvotes table
+2. Increment Posts.upvote_count
+3. If post author is contributor, increment Contributors.reputation_score
+
+================================================================================
+TABLE 12: FLAGS
+================================================================================
+
+Purpose: Content moderation - users can flag inappropriate content.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+post_id             INTEGER NOT NULL FOREIGN KEY -> Posts(id)
+user_id             INTEGER NOT NULL FOREIGN KEY -> Users(id)
+reason              ENUM('spam', 'inappropriate', 'misinformation', 'other')
+description         TEXT
+status              ENUM('pending', 'reviewed', 'dismissed') DEFAULT 'pending'
+reviewer_id         INTEGER NULL FOREIGN KEY -> Users(id) (admin)
+reviewed_at         TIMESTAMP NULL
+created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Business Rules:
+- Multiple users can flag the same post
+- Admin reviews flags and takes action
+- If post is removed, contributor reputation decreases
+
+Relationships:
+- Many Flags belong to one Post (many:1)
+- Many Flags belong to one User (many:1, as flagger)
+
+================================================================================
+TABLE 13: SIMULATION_TEMPLATES
+================================================================================
+
+Purpose: Career simulation data for each program.
+
+Fields:
+--------
+id                      INTEGER PRIMARY KEY AUTO_INCREMENT
+program_id              INTEGER UNIQUE NOT NULL FOREIGN KEY -> Programs(id)
+weekly_schedule         JSON (array of daily schedules)
+typical_projects        JSON (array of project descriptions)
+internship_examples     JSON (array of internship types)
+skills_assessment       JSON (skills checklist)
+career_path_visualization TEXT (description of career progression)
+personality_traits      JSON (array of traits that fit)
+created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Business Rules:
+- One program has one simulation template
+- JSON fields store structured data
+- Can be created/updated by department users
+
+Relationships:
+- One SimulationTemplate belongs to one Program (1:1)
+
+Example weekly_schedule JSON:
+[
+  {"day": "Monday", "activities": ["Lecture: Data Structures", "Lab: Programming"]},
+  {"day": "Tuesday", "activities": ["Project Work", "Tutorial"]}
+]
+
+================================================================================
+TABLE 14: SIMULATION_SESSIONS
+================================================================================
+
+Purpose: Track when students use career simulation.
+
+Fields:
+--------
+id                  INTEGER PRIMARY KEY AUTO_INCREMENT
+student_id          INTEGER NOT NULL FOREIGN KEY -> Students(id)
+simulation_id       INTEGER NOT NULL FOREIGN KEY -> SimulationTemplates(id)
+started_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+completed_at        TIMESTAMP NULL
+feedback_shown      BOOLEAN DEFAULT FALSE
+
+Business Rules:
+- Tracks engagement metrics
+- Used to measure simulation usage
+
+Relationships:
+- Many SimulationSessions belong to one Student (many:1)
+- Many SimulationSessions reference one SimulationTemplate (many:1)
+
+================================================================================
+RELATIONSHIP DIAGRAM (Text Representation)
+================================================================================
+
+Users
+  ├── 1:1 ──> Students
+  ├── 1:1 ──> Contributors
+  └── 1:1 ──> (if role='department') Department Users
+
+Departments
+  └── 1:many ──> Programs
+
+Programs
+  ├── 1:many ──> GuidanceThreads
+  ├── 1:1 ──> SimulationTemplates
+  └── many:many ──> Students (via SavedPrograms)
+
+Students
+  ├── 1:many ──> StudentInterests
+  ├── 1:many ──> SavedPrograms
+  ├── 1:many ──> GuidanceThreads (as question asker)
+  └── 1:many ──> SimulationSessions
+
+Contributors
+  ├── 1:many ──> Posts (as answerer)
+  └── 1:many ──> VerificationAuditLog
+
+GuidanceThreads
+  └── 1:many ──> Posts
+
+Posts
+  ├── 1:many ──> Upvotes
+  └── 1:many ──> Flags
+
+================================================================================
+KEY BUSINESS RULES SUMMARY
+================================================================================
+
+1. OFFICIAL vs CONTRIBUTOR DATA:
+   - Programs table: Official data (entry_requirements, skills, outcomes)
+   - Posts table: Contributor opinions/answers
+   - These are NEVER mixed in the same table
+
+2. VERIFICATION WORKFLOW:
+   - User registers -> Contributor profile created with state 'unverified'
+   - User applies -> State changes to 'pending', admin reviews
+   - Admin approves -> State changes to 'verified', reputation +10
+   - Admin rejects -> State changes to 'rejected', can reapply after 30 days
+
+3. REPUTATION SYSTEM:
+   - Starts at 0
+   - +10 for verification
+   - +1 per upvote on answer
+   - +5 for best answer
+   - -10 for flagged/removed content
+
+4. ACCESS CONTROL:
+   - Students: Can browse, ask questions, save programs
+   - Contributors: Can answer questions (if verified)
+   - Departments: Can edit official program data (only their own)
+   - Admins: Can verify contributors, moderate content
+
+5. DATA IMMUTABILITY:
+   - Official program data changes must be logged
+   - Verification state changes must be logged
+   - Deleted posts are soft-deleted (is_flagged = true, not actually deleted)
+
+================================================================================
+INDEXES (For Performance)
+================================================================================
+
+Create indexes on:
+- Users.email (for login lookups)
+- Programs.department_id (for filtering)
+- Programs.code (for search)
+- GuidanceThreads.program_id (for program-specific questions)
+- Posts.thread_id (for loading thread posts)
+- Posts.author_id (for user's posts)
+- Upvotes.post_id (for counting upvotes)
+- Contributors.verification_state (for admin review queue)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Review this model and understand each table
+2. Draw the relationships on paper
+3. Identify any missing fields
+4. Decide on your database system (PostgreSQL recommended)
+5. Write CREATE TABLE statements
+6. Create sample data for testing
+
+================================================================================
+END OF DATA MODEL SPECIFICATION
+================================================================================
+

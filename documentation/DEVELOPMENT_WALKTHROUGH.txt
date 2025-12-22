@@ -1,0 +1,816 @@
+================================================================================
+STEP-BY-STEP DEVELOPMENT WALKTHROUGH
+Career Guidance Platform - NUST
+================================================================================
+
+This document walks you through building this project step by step,
+explaining WHY each step matters and WHAT you're building.
+
+================================================================================
+PHASE 1: UNDERSTANDING & PLANNING (Days 1-2)
+================================================================================
+
+STEP 1.1: Understand the Problem
+---------------------------------
+
+What problem are you solving?
+- Students don't know which career/program to choose
+- They need trustworthy information
+- They need to hear from people who've been there
+- But unverified opinions can be misleading
+
+Your solution:
+- Official facts from departments (trustworthy)
+- Verified contributor answers (real experiences)
+- Clear separation between the two
+
+ACTION: Write down in your own words what this platform does.
+This ensures you understand the core concept before coding.
+
+================================================================================
+
+STEP 1.2: Map User Journeys
+----------------------------
+
+Draw these flows on paper:
+
+STUDENT JOURNEY:
+1. Student visits platform
+2. Browses programs (sees official data)
+3. Clicks on "Computer Science" program
+4. Sees official requirements, skills, outcomes
+5. Scrolls down, sees Q&A section
+6. Asks question: "Is CS101 very math-heavy?"
+7. Verified contributor answers
+8. Student upvotes helpful answer
+9. Student saves program to "My Saved Programs"
+
+CONTRIBUTOR JOURNEY:
+1. Alumni registers
+2. Applies for verification (uploads NUST certificate)
+3. Admin reviews and approves
+4. Contributor sees questions
+5. Answers question about CS101
+6. Gets upvoted, reputation increases
+7. More students trust their answers
+
+DEPARTMENT JOURNEY:
+1. Department admin logs in
+2. Updates CS101 program info (new entry requirements)
+3. Change is logged (audit trail)
+4. All students see updated official data
+
+ACTION: Draw these flows. This helps you understand what features you need.
+
+================================================================================
+
+STEP 1.3: Choose Your Technology Stack
+--------------------------------------
+
+You need to decide on:
+
+BACKEND (Server-side logic):
+Options:
+- Django (Python) - RECOMMENDED FOR BEGINNERS
+  Why: Built-in admin panel, ORM handles database, lots of tutorials
+  Learning curve: Medium
+  Good for: Rapid development, MVP
+
+- FastAPI (Python) - RECOMMENDED FOR SPEED
+  Why: Modern, fast, auto-generates API docs
+  Learning curve: Medium
+  Good for: API-focused apps
+
+- Node.js/Express (JavaScript)
+  Why: Same language as frontend, good ecosystem
+  Learning curve: Medium
+  Good for: If you know JavaScript well
+
+- Laravel (PHP)
+  Why: Rapid development, good MVC structure
+  Learning curve: Medium
+  Good for: Traditional web apps
+
+DATABASE:
+- PostgreSQL - RECOMMENDED
+  Why: Robust, handles JSON fields well, free
+- MySQL
+  Why: Widely used, easy to set up
+
+FRONTEND:
+- React - RECOMMENDED
+  Why: Component-based, large ecosystem, job market
+- Vue.js
+  Why: Easier learning curve, good documentation
+- Plain HTML/CSS/JavaScript
+  Why: Simplest, no build tools needed
+
+AUTHENTICATION:
+- JWT (JSON Web Tokens) - RECOMMENDED
+  Why: Stateless, works well with APIs
+- Session-based
+  Why: Simpler, built into frameworks
+
+ACTION: Choose your stack. Write down WHY you chose each piece.
+Don't just pick randomly - understand the trade-offs.
+
+================================================================================
+PHASE 2: DATABASE FOUNDATION (Days 2-3)
+================================================================================
+
+STEP 2.1: Set Up Database
+--------------------------
+
+1. Install PostgreSQL (or MySQL)
+2. Create database: career_guidance_db
+3. Create user with permissions
+
+ACTION: Get your database running. Test connection.
+
+================================================================================
+
+STEP 2.2: Create Core Tables (Start Simple)
+--------------------------------------------
+
+Start with these 3 tables ONLY:
+
+1. USERS table
+   - This is your authentication table
+   - Every user starts here
+   - Fields: id, email, password_hash, role, created_at
+
+2. DEPARTMENTS table
+   - Simple list of NUST departments
+   - Fields: id, name, code, created_at
+
+3. PROGRAMS table
+   - The core entity
+   - Fields: id, name, code, department_id, description, created_at
+
+WHY START HERE?
+- No complex relationships yet
+- You can test basic CRUD operations
+- Builds confidence before adding complexity
+
+ACTION: Write CREATE TABLE statements for these 3 tables.
+Test inserting and querying data.
+
+SQL Example (PostgreSQL):
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'student',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE programs (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    code VARCHAR(50) UNIQUE,
+    department_id INTEGER REFERENCES departments(id),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+================================================================================
+
+STEP 2.3: Add Sample Data
+--------------------------
+
+Insert test data so you have something to work with:
+
+INSERT INTO departments (name, code) VALUES
+('Computer Science', 'CS'),
+('Electrical Engineering', 'EE'),
+('Mechanical Engineering', 'ME');
+
+INSERT INTO programs (name, code, department_id, description) VALUES
+('Bachelor of Computer Science', 'CS101', 1, 'Four-year degree in computer science'),
+('Bachelor of Electrical Engineering', 'EE201', 2, 'Four-year degree in electrical engineering');
+
+WHY?
+- You need data to test your API
+- You need data to build your frontend
+- Empty database = nothing to display
+
+ACTION: Insert 5-10 sample programs from NUST.
+Use real program names if you know them.
+
+================================================================================
+PHASE 3: BACKEND API - PROGRAMS MODULE (Days 3-5)
+================================================================================
+
+STEP 3.1: Set Up Backend Project
+----------------------------------
+
+1. Create project folder: career-guidance-backend
+2. Initialize framework (Django/FastAPI/etc)
+3. Set up database connection
+4. Create basic project structure
+
+ACTION: Get a "Hello World" API endpoint working.
+Test it with Postman or browser.
+
+Example (FastAPI):
+
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Career Guidance API is running"}
+
+Run it, visit http://localhost:8000, see the message.
+
+================================================================================
+
+STEP 3.2: Create Programs API Endpoints
+----------------------------------------
+
+Build these endpoints ONE AT A TIME:
+
+1. GET /api/programs
+   Purpose: List all programs
+   Returns: Array of program objects
+   Test: Should return your sample programs
+
+2. GET /api/programs/{id}
+   Purpose: Get one program by ID
+   Returns: Single program object
+   Test: GET /api/programs/1 should return CS101
+
+3. GET /api/programs?department=1
+   Purpose: Filter by department
+   Returns: Programs in that department
+   Test: Should return only CS programs
+
+4. GET /api/programs?search=computer
+   Purpose: Search by name
+   Returns: Matching programs
+   Test: Should find "Computer Science"
+
+WHY ONE AT A TIME?
+- Easier to debug
+- You understand each piece
+- Can test incrementally
+
+ACTION: Build endpoint 1, test it, then move to 2, etc.
+Don't build all 4 at once.
+
+Example endpoint structure (FastAPI):
+
+from fastapi import FastAPI
+from database import get_db_connection
+
+app = FastAPI()
+
+@app.get("/api/programs")
+def get_programs():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM programs")
+    programs = cursor.fetchall()
+    return {"programs": programs}
+
+================================================================================
+
+STEP 3.3: Add Error Handling
+-----------------------------
+
+What happens if:
+- Program ID doesn't exist? (404 Not Found)
+- Database connection fails? (500 Server Error)
+- Invalid search query? (400 Bad Request)
+
+ACTION: Add try-catch blocks and return proper HTTP status codes.
+
+Example:
+
+@app.get("/api/programs/{id}")
+def get_program(id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM programs WHERE id = %s", (id,))
+    program = cursor.fetchone()
+    
+    if not program:
+        return {"error": "Program not found"}, 404
+    
+    return {"program": program}
+
+================================================================================
+PHASE 4: FRONTEND - PROGRAMS DISPLAY (Days 5-7)
+================================================================================
+
+STEP 4.1: Set Up Frontend Project
+-----------------------------------
+
+1. Create project folder: career-guidance-frontend
+2. Initialize React (or your chosen framework)
+3. Set up basic routing
+4. Create folder structure:
+   - components/
+   - pages/
+   - services/ (API calls)
+
+ACTION: Get a basic page rendering.
+Display "Career Guidance Platform" on screen.
+
+================================================================================
+
+STEP 4.2: Create Program List Page
+------------------------------------
+
+Build this page step by step:
+
+1. Create API service function:
+   - fetchPrograms() - calls GET /api/programs
+   - Test this first (console.log the response)
+
+2. Create ProgramCard component:
+   - Displays: name, code, department, description
+   - Simple card design
+   - Test with hardcoded data first
+
+3. Create ProgramList page:
+   - Fetches programs from API
+   - Maps over programs, renders ProgramCard for each
+   - Shows loading state while fetching
+   - Shows error message if fetch fails
+
+WHY THIS ORDER?
+- API call first (backend connection)
+- Component second (UI piece)
+- Page third (puts it together)
+
+ACTION: Build each piece, test it, then combine.
+
+Example component structure:
+
+// services/api.js
+export async function fetchPrograms() {
+    const response = await fetch('http://localhost:8000/api/programs');
+    const data = await response.json();
+    return data.programs;
+}
+
+// components/ProgramCard.js
+function ProgramCard({ program }) {
+    return (
+        <div className="program-card">
+            <h3>{program.name}</h3>
+            <p>{program.code}</p>
+            <p>{program.description}</p>
+        </div>
+    );
+}
+
+// pages/ProgramList.js
+import { fetchPrograms } from '../services/api';
+import ProgramCard from '../components/ProgramCard';
+
+function ProgramList() {
+    const [programs, setPrograms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        fetchPrograms().then(data => {
+            setPrograms(data);
+            setLoading(false);
+        });
+    }, []);
+    
+    if (loading) return <div>Loading...</div>;
+    
+    return (
+        <div>
+            {programs.map(program => (
+                <ProgramCard key={program.id} program={program} />
+            ))}
+        </div>
+    );
+}
+
+================================================================================
+
+STEP 4.3: Add Search and Filter
+--------------------------------
+
+1. Add search input field
+2. On input change, filter programs client-side (simple)
+3. Later: Send search query to backend API
+
+ACTION: Get basic filtering working first (client-side),
+then upgrade to backend search.
+
+================================================================================
+PHASE 5: AUTHENTICATION (Days 7-9)
+================================================================================
+
+STEP 5.1: Understand Authentication Flow
+---------------------------------------
+
+1. User registers (email + password)
+2. Password is hashed (never store plain text)
+3. User logs in (email + password)
+4. Server validates, returns JWT token
+5. Frontend stores token
+6. Every API request includes token in header
+7. Server validates token before processing request
+
+ACTION: Read about JWT tokens. Understand the flow.
+Don't code yet - just understand.
+
+================================================================================
+
+STEP 5.2: Implement Registration
+----------------------------------
+
+Backend:
+1. POST /api/auth/register
+   - Receives: email, password, full_name, role
+   - Hashes password (use bcrypt)
+   - Saves to Users table
+   - Returns: user object (no password!)
+
+2. Test with Postman:
+   POST http://localhost:8000/api/auth/register
+   Body: {"email": "test@example.com", "password": "test123", "role": "student"}
+
+ACTION: Build registration endpoint. Test it thoroughly.
+
+================================================================================
+
+STEP 5.3: Implement Login
+---------------------------
+
+Backend:
+1. POST /api/auth/login
+   - Receives: email, password
+   - Finds user by email
+   - Compares password hash
+   - If valid: returns JWT token
+   - If invalid: returns 401 Unauthorized
+
+2. Frontend:
+   - Login form (email + password)
+   - On submit, call login API
+   - Store token in localStorage
+   - Redirect to dashboard
+
+ACTION: Build login. Test the full flow.
+
+================================================================================
+
+STEP 5.4: Protect Routes
+------------------------
+
+Create middleware that:
+1. Checks for JWT token in request header
+2. Validates token
+3. If valid: allows request, adds user info to request
+4. If invalid: returns 401 Unauthorized
+
+Apply to protected endpoints:
+- POST /api/programs (only departments can create)
+- POST /api/threads (only logged-in users)
+
+ACTION: Add authentication middleware. Protect your API endpoints.
+
+================================================================================
+PHASE 6: ADD MORE TABLES (Days 9-10)
+================================================================================
+
+STEP 6.1: Add Students Table
+-----------------------------
+
+1. Create Students table (see data model)
+2. When user registers with role='student', create Student profile
+3. Add endpoint: GET /api/students/profile (get current user's profile)
+
+ACTION: Add Students table. Link it to Users.
+
+================================================================================
+
+STEP 6.2: Add Contributors Table
+----------------------------------
+
+1. Create Contributors table (see data model)
+2. When user wants to become contributor, create Contributor profile
+3. State starts as 'unverified'
+
+ACTION: Add Contributors table. Add basic verification state.
+
+================================================================================
+PHASE 7: Q&A SYSTEM (Days 10-14)
+================================================================================
+
+STEP 7.1: Create Q&A Tables
+----------------------------
+
+1. Create GuidanceThreads table
+2. Create Posts table
+3. Create Upvotes table
+
+ACTION: Write CREATE TABLE statements. Understand the relationships.
+
+================================================================================
+
+STEP 7.2: Build Q&A Backend
+-----------------------------
+
+Endpoints to build:
+
+1. POST /api/threads
+   - Creates new question thread
+   - Requires: student must be logged in
+   - Body: title, content, program_id (optional)
+
+2. GET /api/threads
+   - Lists all threads
+   - Can filter by program_id
+
+3. GET /api/threads/{id}
+   - Gets thread with all posts
+
+4. POST /api/threads/{id}/posts
+   - Adds answer to thread
+   - Requires: verified contributor
+   - Body: content
+
+5. POST /api/posts/{id}/upvote
+   - Upvotes a post
+   - Updates reputation
+
+ACTION: Build one endpoint at a time. Test each thoroughly.
+
+================================================================================
+
+STEP 7.3: Build Q&A Frontend
+------------------------------
+
+Components to build:
+
+1. QuestionThread component
+   - Displays thread title
+   - Shows all posts (question + answers)
+   - Shows upvote counts
+
+2. AnswerForm component
+   - Text area for answer
+   - Submit button
+   - Only visible to verified contributors
+
+3. ThreadList component
+   - Lists all threads
+   - Click to view thread
+
+ACTION: Build components. Connect to API.
+
+================================================================================
+PHASE 8: VERIFICATION SYSTEM (Days 14-16)
+================================================================================
+
+STEP 8.1: Build Verification Backend
+-------------------------------------
+
+1. POST /api/contributors/apply
+   - User applies for verification
+   - Uploads document (or provides university email)
+   - State changes: unverified -> pending
+
+2. GET /api/admin/pending-verifications
+   - Admin sees queue of pending applications
+   - Returns list of pending contributors
+
+3. POST /api/admin/verify/{id}
+   - Admin approves verification
+   - State changes: pending -> verified
+   - Reputation +10
+   - Log in audit trail
+
+ACTION: Build verification workflow. Test the state transitions.
+
+================================================================================
+
+STEP 8.2: Build Verification Frontend
+-------------------------------------
+
+1. VerificationApplicationForm
+   - File upload for credentials
+   - Submit button
+   - Shows current status
+
+2. AdminReviewQueue (admin only)
+   - Lists pending applications
+   - Approve/Reject buttons
+   - Shows applicant info
+
+ACTION: Build verification UI. Test the full workflow.
+
+================================================================================
+PHASE 9: CAREER SIMULATION (Days 17-18)
+================================================================================
+
+STEP 9.1: Create Simulation Data Structure
+---------------------------------------------
+
+1. Create SimulationTemplates table
+2. For each program, create simulation template
+3. Store as JSON:
+   - Weekly schedule
+   - Typical projects
+   - Skills needed
+
+ACTION: Design simulation data. Create templates for 3-5 programs.
+
+================================================================================
+
+STEP 9.2: Build Simulation Backend
+-----------------------------------
+
+1. GET /api/simulations/{program_id}
+   - Returns simulation template for program
+
+2. POST /api/simulations/{id}/start
+   - Records that student started simulation
+   - Tracks engagement
+
+ACTION: Build simulation API. Return structured data.
+
+================================================================================
+
+STEP 9.3: Build Simulation Frontend
+------------------------------------
+
+1. SimulationView component
+   - Displays weekly schedule
+   - Shows typical projects
+   - Shows skills checklist
+   - Shows career path
+
+2. FeedbackPanel
+   - Compares student interests to program requirements
+   - Shows fit score
+
+ACTION: Build simulation UI. Make it engaging.
+
+================================================================================
+PHASE 10: POLISH & DEPLOYMENT (Days 19-21)
+================================================================================
+
+STEP 10.1: Add Error Handling Everywhere
+-----------------------------------------
+
+- Frontend: Show user-friendly error messages
+- Backend: Return proper HTTP status codes
+- Log errors for debugging
+
+ACTION: Go through your code, add error handling.
+
+================================================================================
+
+STEP 10.2: Add Loading States
+------------------------------
+
+- Show "Loading..." while fetching data
+- Disable buttons during submission
+- Show success messages
+
+ACTION: Improve UX with loading states.
+
+================================================================================
+
+STEP 10.3: Security Audit
+--------------------------
+
+Checklist:
+- [ ] Passwords are hashed
+- [ ] JWT tokens expire
+- [ ] Input validation on all endpoints
+- [ ] SQL injection prevented (use parameterized queries)
+- [ ] XSS protection (sanitize user input)
+- [ ] CORS configured properly
+- [ ] Rate limiting on auth endpoints
+
+ACTION: Review security. Fix vulnerabilities.
+
+================================================================================
+
+STEP 10.4: Testing
+------------------
+
+Test these flows:
+1. User registration and login
+2. Browse programs
+3. Ask question
+4. Answer question (as contributor)
+5. Upvote answer
+6. Apply for verification
+7. Admin approves verification
+8. Use career simulation
+
+ACTION: Test everything. Fix bugs.
+
+================================================================================
+
+STEP 10.5: Deployment
+---------------------
+
+1. Choose hosting (Heroku, DigitalOcean, AWS)
+2. Set up production database
+3. Configure environment variables
+4. Deploy backend
+5. Deploy frontend
+6. Test in production
+
+ACTION: Deploy. Get it live.
+
+================================================================================
+KEY PRINCIPLES TO REMEMBER
+================================================================================
+
+1. BUILD INCREMENTALLY
+   - Don't try to build everything at once
+   - Get one feature working, then add the next
+   - Test as you go
+
+2. UNDERSTAND BEFORE CODING
+   - Read the data model
+   - Understand relationships
+   - Know what each table stores
+
+3. START SIMPLE
+   - Begin with basic CRUD
+   - Add complexity gradually
+   - Refactor later if needed
+
+4. TEST CONSTANTLY
+   - Test each endpoint
+   - Test each component
+   - Test user flows
+
+5. SEPARATE CONCERNS
+   - Official data vs contributor data
+   - Backend logic vs frontend display
+   - Authentication vs authorization
+
+================================================================================
+TROUBLESHOOTING GUIDE
+================================================================================
+
+Problem: "I don't know where to start"
+Solution: Start with Programs table. It's the simplest, no dependencies.
+
+Problem: "My API doesn't work"
+Solution: Test with Postman first. Check database connection. Check error logs.
+
+Problem: "Frontend can't connect to backend"
+Solution: Check CORS settings. Check API URL. Check if backend is running.
+
+Problem: "I'm stuck on authentication"
+Solution: Use a library (don't build from scratch). Follow a tutorial for your framework.
+
+Problem: "Database relationships are confusing"
+Solution: Draw them on paper. Start with one-to-many relationships first.
+
+================================================================================
+RESOURCES TO LEARN FROM
+================================================================================
+
+Database Design:
+- Learn about normalization
+- Understand foreign keys
+- Study one-to-many, many-to-many relationships
+
+API Design:
+- RESTful API principles
+- HTTP status codes
+- Request/response formats
+
+Authentication:
+- JWT token tutorial for your framework
+- Password hashing (bcrypt)
+- Session management
+
+Frontend:
+- Component-based architecture
+- State management
+- API integration
+
+================================================================================
+END OF WALKTHROUGH
+================================================================================
+
+Remember: You're building this to learn. Don't rush. Understand each piece.
+Ask questions. Test everything. Good luck!
+

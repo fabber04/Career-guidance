@@ -1,0 +1,131 @@
+Student Career Guidance Platform -
+
+ System documentation (Draft):
+
+    overview - The platform gives post-A-Level students a clear, trustworthy path through the chaos of career decisions.
+    it connects them with verified contributors- senior students, alumni and professional.
+
+    the system avoids two extremes;
+
+    1. TURNING DEPARTMENTS INTO COMPLAINT CENTRES
+    2. LETTING UNVERIFIED OPINIONS MASQUERADE AS FACT
+
+
+    THE ARCHITECTURE CREATES A BALANCE: OFFICIAL FACTS REMAIN AUTHORATIVE, WHILE CONTRIBUTORS ADD HUMAN-LEVEL INTERPRETION.
+
+
+CORE OBJECTIVES:
+
+1. Provide structured career guidance tailored to student's interests 
+2. CREATE A TRUSTED environment using contributor verification 
+3. reduce misinformation by separating OFFICIAL program data from public discussion 
+4. make departments contributors of facts, not emotional managers 
+5. Scale effortlessly - new programs, new contributors , new guidance categories. 
+
+
+
+USER ROLES:
+
+1. Students - browse
+            ask questions 
+            save interests
+            follow contributors
+            view departmental requirements 
+
+
+
+2. Verified Contributors - answer questions
+                            provide student-level interpretation of official info 
+                            maintain a reputation score 
+                            get verified through the platform's verification engine 
+
+
+3. Departments and programs - publish official requirements
+                            provide factual guidance content 
+                            never engage in dispute resolution 
+                            maintain program info pages accessible platfom-wide
+
+
+
+System Architecture:
+
+-   Domain Modules
+
+Student Module - Handles student profiles, interests, question history, saved career paths 
+
+Contributor Module - Stores verification status, credentials, activity logs and reputation 
+
+program Module - Holds official department information - Entry requirements
+                                                            career paths 
+                                                            program outline
+                                                            skills outcomes
+
+
+========================================
+=========================
+=============
+
+
+FRONTEND ARCHITECTURE;
+
+1. COMPONENT PHILOSOPHY 
+
+components are structured around roles not pages:
+
+- StudentDashboard
+-ContributorDashboard
+-ProgramOverviewCard
+-GuidanceThread
+-VerificationStatusBadge 
+
+
+##everything is reusable, style-consistent and scalable 
+
+ 
+Navigation Flow::
+
+students ---> Explore programs ----> Ask questions ---> View Responses
+Contributors ---> View questions ---> Respond ---> Build reputation
+Departments ---> Update Programa Data
+
+
+WHAT THE TOOL ACTUALLY DOES:
+
+A career simulation lets a student "step into the shoes" of a specific field and see -
+    1. the skills needed 
+    2. the tasks done in the job 
+    3. the typical learning path
+    4. the future job prospects 
+    5. the personality traits that fit the work 
+
+
+
+ its not a predictive machine; its a guided exploration system.
+
+
+
+What the student experiences:
+
+imagine clicking "Simulate Software Engineering"
+
+The Tool might show:
+
+    - A mock weekly schedule (lectures, labs, project work) 
+    - A typical final-year project 
+    - the types of internship students pursue 
+    - feedback comparing the career's demands to students chosen interests 
+
+
+
+WHY THIS MATTERS:
+
+students often choose careers based on:
+
+- Hype 
+- Family pressure
+- What their friends are doing 
+- Random internet advice (e.g most paying jobs without understanding whats required of them)
+
+
+
+I want this to be National University of Science and technology oriented. and branch out later
