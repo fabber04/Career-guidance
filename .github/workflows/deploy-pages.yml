@@ -30,17 +30,21 @@ jobs:
       
       - name: Prepare files for deployment
         run: |
-          # Copy prototype files to root, excluding README.md
-          cp prototype/index.html .
-          cp -r prototype/styles .
-          cp -r prototype/scripts .
-          # Remove any README.md files that might interfere
-          rm -f README.md prototype/README.md
+          # Create a clean deployment directory
+          mkdir -p _site
+          # Copy prototype files to _site
+          cp prototype/index.html _site/
+          cp -r prototype/styles _site/
+          cp -r prototype/scripts _site/
+          # Create .nojekyll to prevent Jekyll processing
+          touch _site/.nojekyll
+          # List files to verify deployment
+          ls -la _site/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       
       - name: Deploy to GitHub Pages
         id: deployment
