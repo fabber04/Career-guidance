@@ -30,24 +30,23 @@ jobs:
       
       - name: Prepare files for deployment
         run: |
-          # Create a clean deployment directory
-          mkdir -p _site
-          # Copy prototype files to _site
-          cp prototype/index.html _site/index.html
-          cp -r prototype/styles _site/
-          cp -r prototype/scripts _site/
+          # Copy prototype files to root for GitHub Pages
+          cp prototype/index.html index.html
+          cp -r prototype/styles .
+          cp -r prototype/scripts .
           # Create .nojekyll to prevent Jekyll processing
-          touch _site/.nojekyll
-          # Verify files are in place
-          echo "Files in _site:"
-          ls -la _site/
-          echo "Checking index.html exists:"
-          test -f _site/index.html && echo "✓ index.html found" || echo "✗ index.html missing"
+          touch .nojekyll
+          # Remove any README files that might interfere
+          rm -f README.md documentation/README.md
+          # Verify index.html exists
+          echo "Verifying deployment files:"
+          ls -la index.html styles/ scripts/ || echo "Error: Files not found"
+          test -f index.html && echo "✓ index.html ready" || echo "✗ index.html missing"
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '_site'
+          path: '.'
       
       - name: Deploy to GitHub Pages
         id: deployment
