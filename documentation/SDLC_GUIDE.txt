@@ -1,0 +1,591 @@
+================================================================================
+SOFTWARE DEVELOPMENT LIFECYCLE (SDLC) GUIDE
+Career Guidance Platform - NUST
+================================================================================
+
+This document outlines the proper software development cycle for building
+the Career Guidance Platform following industry best practices.
+
+================================================================================
+SDLC PHASES OVERVIEW
+================================================================================
+
+1. PLANNING & REQUIREMENTS GATHERING
+2. SYSTEM ANALYSIS & DESIGN
+3. DEVELOPMENT (Implementation)
+4. TESTING
+5. DEPLOYMENT
+6. MAINTENANCE & UPDATES
+
+================================================================================
+PHASE 1: PLANNING & REQUIREMENTS GATHERING
+================================================================================
+
+STATUS: ✅ COMPLETED
+- Project Outline defined
+- Requirements documented
+- User roles identified
+- Core objectives established
+
+DELIVERABLES:
+✓ Project Outline.txt
+✓ Requirements document
+✓ User journey maps
+✓ Feature list
+
+NEXT STEPS:
+- Review and refine requirements
+- Prioritize features (MVP vs. Future)
+- Define success metrics
+
+================================================================================
+PHASE 2: SYSTEM ANALYSIS & DESIGN
+================================================================================
+
+STATUS: ✅ MOSTLY COMPLETED
+- Data model specified
+- Architecture designed
+- UI/UX prototype created
+
+DELIVERABLES:
+✓ DATA_MODEL_SPECIFICATION.txt (Complete database schema)
+✓ UI/UX Prototype (HTML/CSS/JS)
+✓ System architecture defined
+
+REMAINING WORK:
+- API design specification
+- Security architecture
+- Performance requirements
+- Integration points
+
+ACTION ITEMS:
+1. Create API endpoint specification document
+2. Design authentication flow diagrams
+3. Define API request/response formats
+4. Create database ER diagram (visual)
+
+================================================================================
+PHASE 3: DEVELOPMENT (Implementation)
+================================================================================
+
+STATUS: 🔄 IN PROGRESS
+- Prototype completed
+- Need to build full-stack application
+
+DEVELOPMENT METHODOLOGY: Agile/Iterative
+
+SPRINT STRUCTURE (2-week sprints):
+-----------------------------------
+
+SPRINT 0: Setup & Foundation (Week 1-2)
+- [ ] Set up development environment
+- [ ] Choose and configure technology stack
+- [ ] Set up version control workflow
+- [ ] Create project structure
+- [ ] Set up database
+- [ ] Create initial migrations
+
+SPRINT 1: Authentication & User Management (Week 3-4)
+- [ ] User registration
+- [ ] User login/logout
+- [ ] Password reset
+- [ ] User profiles
+- [ ] Role-based access control (RBAC)
+
+SPRINT 2: Core Data & Programs (Week 5-6)
+- [ ] Department management
+- [ ] Program CRUD operations
+- [ ] Program listing and search
+- [ ] Program detail pages
+- [ ] Official data management
+
+SPRINT 3: Q&A System (Week 7-8)
+- [ ] Question creation
+- [ ] Answer posting
+- [ ] Upvoting system
+- [ ] Best answer selection
+- [ ] Thread management
+
+SPRINT 4: Reviews & Ratings (Week 9-10)
+- [ ] Review creation
+- [ ] Rating system
+- [ ] Pros/Cons format
+- [ ] Review filtering
+- [ ] Helpful voting
+
+SPRINT 5: Verification System (Week 11-12)
+- [ ] Contributor verification workflow
+- [ ] Admin review queue
+- [ ] Verification audit log
+- [ ] Reputation system
+- [ ] Badge system
+
+SPRINT 6: Chat System (Week 13-14)
+- [ ] Student profile display
+- [ ] Chat interface
+- [ ] Message sending/receiving
+- [ ] Online status
+- [ ] Chat history
+
+SPRINT 7: Career Outcomes & Analytics (Week 15-16)
+- [ ] Career fields display
+- [ ] Employment statistics
+- [ ] Outcome data management
+- [ ] Analytics dashboard
+
+SPRINT 8: Polish & Optimization (Week 17-18)
+- [ ] Performance optimization
+- [ ] Security audit
+- [ ] Bug fixes
+- [ ] UI/UX refinements
+- [ ] Mobile optimization
+
+================================================================================
+DEVELOPMENT WORKFLOW
+================================================================================
+
+BRANCH STRATEGY (Git Flow):
+---------------------------
+
+main branch:
+- Production-ready code only
+- Protected (requires PR approval)
+- Auto-deploys to production
+
+develop branch:
+- Integration branch
+- All feature branches merge here first
+- Testing happens here
+
+feature branches:
+- Naming: feature/sprint-X-feature-name
+- Examples:
+  * feature/sprint-1-user-authentication
+  * feature/sprint-2-program-crud
+  * feature/sprint-3-qa-system
+
+hotfix branches:
+- For urgent production fixes
+- Naming: hotfix/issue-description
+
+WORKFLOW STEPS:
+---------------
+
+1. Create feature branch from develop:
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/sprint-1-user-authentication
+
+2. Develop feature:
+   - Write code
+   - Commit frequently with clear messages
+   - Push to remote feature branch
+
+3. Create Pull Request:
+   - PR from feature → develop
+   - Add description
+   - Request review
+   - Address feedback
+
+4. Merge to develop:
+   - After approval, merge PR
+   - Delete feature branch
+
+5. Deploy to staging:
+   - Test on staging environment
+   - Fix any issues
+
+6. Merge to main:
+   - After testing, merge develop → main
+   - Deploy to production
+
+COMMIT MESSAGE FORMAT:
+----------------------
+
+Format: [TYPE] Brief description
+
+Types:
+- FEAT: New feature
+- FIX: Bug fix
+- DOCS: Documentation changes
+- STYLE: Code style changes (formatting)
+- REFACTOR: Code refactoring
+- TEST: Adding tests
+- CHORE: Maintenance tasks
+
+Examples:
+- [FEAT] Add user registration endpoint
+- [FIX] Resolve authentication token expiry issue
+- [DOCS] Update API documentation
+- [REFACTOR] Optimize database queries
+
+================================================================================
+PHASE 4: TESTING
+================================================================================
+
+TESTING STRATEGY:
+----------------
+
+1. UNIT TESTS:
+   - Test individual functions/methods
+   - Test business logic
+   - Test data validation
+   - Target: 80%+ code coverage
+
+2. INTEGRATION TESTS:
+   - Test API endpoints
+   - Test database operations
+   - Test authentication flows
+   - Test file uploads
+
+3. END-TO-END (E2E) TESTS:
+   - Test complete user journeys
+   - Test cross-browser compatibility
+   - Test mobile responsiveness
+
+4. MANUAL TESTING:
+   - User acceptance testing (UAT)
+   - Exploratory testing
+   - Usability testing
+
+TESTING CHECKLIST (Per Feature):
+---------------------------------
+- [ ] Unit tests written
+- [ ] Integration tests written
+- [ ] Manual testing completed
+- [ ] Edge cases tested
+- [ ] Error handling tested
+- [ ] Security tested
+- [ ] Performance tested
+- [ ] Mobile tested
+- [ ] Cross-browser tested
+
+TESTING TOOLS:
+--------------
+- Backend: pytest (Python) or Jest (Node.js)
+- Frontend: Jest, React Testing Library
+- E2E: Playwright or Cypress
+- API: Postman or Insomnia
+
+================================================================================
+PHASE 5: DEPLOYMENT
+================================================================================
+
+DEPLOYMENT ENVIRONMENTS:
+------------------------
+
+1. DEVELOPMENT:
+   - Local development
+   - Each developer's machine
+   - Purpose: Feature development
+
+2. STAGING:
+   - Mirrors production
+   - For testing before production
+   - Purpose: Integration testing
+
+3. PRODUCTION:
+   - Live site
+   - Real users
+   - Purpose: Public access
+
+DEPLOYMENT STRATEGY:
+--------------------
+
+Current Setup:
+- Frontend: GitHub Pages (prototype)
+- Future: Full-stack deployment needed
+
+Recommended Production Setup:
+- Backend: 
+  * Option 1: Heroku (easy, free tier)
+  * Option 2: DigitalOcean (more control)
+  * Option 3: AWS/GCP (scalable)
+  
+- Database:
+  * PostgreSQL (managed service)
+  * Examples: Heroku Postgres, AWS RDS, DigitalOcean Managed DB
+
+- Frontend:
+  * Option 1: Same domain as backend
+  * Option 2: Netlify/Vercel (static hosting)
+  * Option 3: GitHub Pages (for static)
+
+DEPLOYMENT CHECKLIST:
+---------------------
+- [ ] Environment variables configured
+- [ ] Database migrations run
+- [ ] SSL certificate installed
+- [ ] Domain configured
+- [ ] CDN set up (if needed)
+- [ ] Monitoring configured
+- [ ] Backup strategy in place
+- [ ] Rollback plan ready
+
+================================================================================
+PHASE 6: MAINTENANCE & UPDATES
+================================================================================
+
+ONGOING ACTIVITIES:
+------------------
+
+1. MONITORING:
+   - Error tracking (Sentry, Rollbar)
+   - Performance monitoring
+   - User analytics
+   - Server health
+
+2. SECURITY:
+   - Regular security audits
+   - Dependency updates
+   - Vulnerability scanning
+   - Penetration testing
+
+3. UPDATES:
+   - Feature additions
+   - Bug fixes
+   - Performance improvements
+   - UI/UX enhancements
+
+4. DOCUMENTATION:
+   - Keep docs updated
+   - API documentation
+   - User guides
+   - Developer guides
+
+================================================================================
+PROJECT MANAGEMENT TOOLS
+================================================================================
+
+RECOMMENDED TOOLS:
+------------------
+
+1. TASK MANAGEMENT:
+   - GitHub Issues (free, integrated)
+   - GitHub Projects (Kanban board)
+   - Trello (simple, visual)
+   - Jira (comprehensive)
+
+2. DOCUMENTATION:
+   - GitHub Wiki
+   - Markdown files (current approach)
+   - Notion
+   - Confluence
+
+3. COMMUNICATION:
+   - GitHub Discussions
+   - Slack/Discord
+   - Email
+
+4. CODE QUALITY:
+   - ESLint (JavaScript)
+   - Prettier (code formatting)
+   - SonarQube (code analysis)
+
+================================================================================
+DEVELOPMENT BEST PRACTICES
+================================================================================
+
+CODE QUALITY:
+-------------
+1. Write clean, readable code
+2. Follow coding standards
+3. Use meaningful variable names
+4. Comment complex logic
+5. Keep functions small and focused
+6. DRY (Don't Repeat Yourself)
+
+SECURITY:
+---------
+1. Never commit secrets/API keys
+2. Use environment variables
+3. Hash passwords (bcrypt)
+4. Validate all user input
+5. Use parameterized queries (prevent SQL injection)
+6. Implement rate limiting
+7. Use HTTPS
+8. Regular security audits
+
+PERFORMANCE:
+------------
+1. Optimize database queries
+2. Use caching where appropriate
+3. Minimize API calls
+4. Optimize images
+5. Use CDN for static assets
+6. Implement pagination
+7. Lazy load content
+
+VERSION CONTROL:
+----------------
+1. Commit frequently
+2. Write clear commit messages
+3. Use branches for features
+4. Review code before merging
+5. Keep main branch stable
+
+================================================================================
+CURRENT PROJECT STATUS
+================================================================================
+
+COMPLETED:
+----------
+✓ Planning & Requirements
+✓ Data Model Design
+✓ UI/UX Prototype
+✓ GitHub Repository Setup
+✓ Documentation
+
+IN PROGRESS:
+------------
+🔄 Full-stack development
+🔄 Backend API development
+🔄 Database implementation
+
+TODO:
+-----
+- [ ] Set up development environment
+- [ ] Choose technology stack
+- [ ] Set up database
+- [ ] Implement authentication
+- [ ] Build core features
+- [ ] Write tests
+- [ ] Deploy to staging
+- [ ] Deploy to production
+
+================================================================================
+NEXT IMMEDIATE STEPS
+================================================================================
+
+1. DECIDE ON TECHNOLOGY STACK:
+   - Backend: Django/FastAPI/Node.js?
+   - Database: PostgreSQL/MySQL?
+   - Frontend: React/Vue/Keep current HTML?
+
+2. SET UP DEVELOPMENT ENVIRONMENT:
+   - Install required tools
+   - Set up local database
+   - Configure IDE
+   - Set up Git workflow
+
+3. CREATE PROJECT STRUCTURE:
+   - Backend folder structure
+   - Frontend folder structure
+   - Configuration files
+   - Environment setup
+
+4. SET UP DATABASE:
+   - Create database
+   - Run initial migrations
+   - Seed with test data
+
+5. START SPRINT 1:
+   - Begin with authentication
+   - Follow sprint plan
+   - Track progress
+
+================================================================================
+SPRINT PLANNING TEMPLATE
+================================================================================
+
+SPRINT: [Number] - [Name]
+DURATION: [Start Date] to [End Date]
+
+GOALS:
+- Goal 1
+- Goal 2
+- Goal 3
+
+USER STORIES:
+1. As a [user type], I want [feature] so that [benefit]
+2. As a [user type], I want [feature] so that [benefit]
+
+TASKS:
+- [ ] Task 1
+- [ ] Task 2
+- [ ] Task 3
+
+ACCEPTANCE CRITERIA:
+- Criterion 1
+- Criterion 2
+- Criterion 3
+
+DEFINITION OF DONE:
+- [ ] Code written and reviewed
+- [ ] Tests written and passing
+- [ ] Documentation updated
+- [ ] Deployed to staging
+- [ ] Tested manually
+- [ ] No critical bugs
+
+================================================================================
+METRICS & KPIs
+================================================================================
+
+DEVELOPMENT METRICS:
+-------------------
+- Sprint velocity (story points completed)
+- Code coverage percentage
+- Bug count and resolution time
+- Code review turnaround time
+
+PRODUCT METRICS:
+---------------
+- User registrations
+- Active users
+- Questions asked
+- Answers provided
+- Reviews written
+- Verification requests
+- Chat messages sent
+
+TECHNICAL METRICS:
+------------------
+- Page load time
+- API response time
+- Error rate
+- Uptime percentage
+- Database query performance
+
+================================================================================
+RISK MANAGEMENT
+================================================================================
+
+IDENTIFIED RISKS:
+----------------
+
+1. TECHNICAL RISKS:
+   - Database performance issues
+   - Third-party API failures
+   - Security vulnerabilities
+   - Scalability challenges
+
+2. PROJECT RISKS:
+   - Scope creep
+   - Timeline delays
+   - Resource constraints
+   - Changing requirements
+
+3. BUSINESS RISKS:
+   - Low user adoption
+   - Data privacy concerns
+   - Maintenance costs
+
+MITIGATION STRATEGIES:
+----------------------
+- Regular code reviews
+- Automated testing
+- Performance monitoring
+- Security audits
+- User feedback loops
+- Agile methodology (adapt to changes)
+
+================================================================================
+END OF SDLC GUIDE
+================================================================================
+
+Remember: Software development is iterative. Start with MVP, get feedback,
+and improve continuously.
+
+Good luck with your project!
+
